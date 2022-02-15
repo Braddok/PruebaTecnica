@@ -77,17 +77,8 @@ public class TratesREST {
 		if (optionalTrate.isPresent()) {
 			try {
 				Trates updateTrates = optionalTrate.get();
-				String dPrecio = restTemplate.getForObject(
-						"http://localhost:8081/api/micro/number/" + updateTrates.getPrice(), String.class);
-				String currency = restTemplate.getForObject(
-						"http://localhost:8081/api/micro/currency/" + updateTrates.getCurrency_code(), String.class);
-				formatedTrates.setId(updateTrates.getId());
-				formatedTrates.setBrand_id(updateTrates.getBrand_id());
-				formatedTrates.setStart_date(updateTrates.getStart_date());
-				formatedTrates.setEnd_date(updateTrates.getEnd_date());
-				formatedTrates.setProduct_id(updateTrates.getProduct_id());
-				formatedTrates.setPrice(dPrecio);
-				formatedTrates.setCurrency_code(currency);
+				
+				formatedTrates = getFormatedTrates(updateTrates);
 
 				return ResponseEntity.ok(formatedTrates);
 			} catch (Exception e) {
@@ -130,17 +121,8 @@ public class TratesREST {
 			Date date = format.parse(sDate);
 			List<Trates> listTrates = tratesService.findByTratesDateIdProductIdBrand(date, product_id, brand_id);
 			for (Trates trates : listTrates) {
-				String dPrecio = restTemplate
-						.getForObject("http://localhost:8081/api/micro/number/" + trates.getPrice(), String.class);
-				String currency = restTemplate.getForObject(
-						"http://localhost:8081/api/micro/currency/" + trates.getCurrency_code(), String.class);
-				formatedTrates.setId(trates.getId());
-				formatedTrates.setBrand_id(trates.getBrand_id());
-				formatedTrates.setStart_date(trates.getStart_date());
-				formatedTrates.setEnd_date(trates.getEnd_date());
-				formatedTrates.setProduct_id(trates.getProduct_id());
-				formatedTrates.setPrice(dPrecio);
-				formatedTrates.setCurrency_code(currency);
+				
+				formatedTrates = getFormatedTrates(trates);
 
 				listFormated.add(formatedTrates);
 			}
@@ -150,6 +132,28 @@ public class TratesREST {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 
+	}
+	
+	/**
+	 * Metodo que devuelve el objeto rellenado con el precio y divisa formateado.
+	 * @param trates
+	 * @return
+	 */
+	private FormatedTrates getFormatedTrates (Trates trates){
+		FormatedTrates formatedTrates = new FormatedTrates();
+		
+		String dPrecio = restTemplate.getForObject("http://localhost:8081/api/micro/number/" + trates.getPrice(), String.class);
+		String currency = restTemplate.getForObject("http://localhost:8081/api/micro/currency/" + trates.getCurrency_code(), String.class);
+		formatedTrates.setId(trates.getId());
+		formatedTrates.setBrand_id(trates.getBrand_id());
+		formatedTrates.setStart_date(trates.getStart_date());
+		formatedTrates.setEnd_date(trates.getEnd_date());
+		formatedTrates.setProduct_id(trates.getProduct_id());
+		formatedTrates.setPrice(dPrecio);
+		formatedTrates.setCurrency_code(currency);
+
+
+		return formatedTrates;
 	}
 
 }
